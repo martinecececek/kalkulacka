@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scientific Calculator</title>
+  <meta name="description" content="A fast scientific calculator for the web.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%234f6bed'/><path d='M9 16h14M16 9v14' stroke='white' stroke-width='3' stroke-linecap='round'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <h1>Scientific Calculator</h1>
+
+    <section class="display" aria-live="polite">
+      <div class="status">
+        <span id="i-hyp" class="badge">HYP</span>
+        <span id="i-m" class="badge">M</span>
+      </div>
+      <div class="expr" id="expr"></div>
+      <div class="result" id="result">0</div>
+    </section>
+
+    <div class="toolbar">
+      <div class="nav">
+        <button class="icon" data-k="left" title="Move cursor left" aria-label="Move cursor left">◀</button>
+        <button class="icon" data-k="right" title="Move cursor right" aria-label="Move cursor right">▶</button>
+        <button class="icon" data-k="up" title="Previous calculation" aria-label="Previous calculation">▲</button>
+        <button class="icon" data-k="down" title="Next calculation" aria-label="Next calculation">▼</button>
+      </div>
+      <div class="segmented" role="group" aria-label="Angle unit">
+        <button data-k="deg">DEG</button>
+        <button data-k="rad">RAD</button>
+        <button data-k="gra">GRA</button>
+      </div>
+    </div>
+
+    <div class="panels">
+      <div class="functions">
+        <section class="group">
+          <h2>Trigonometry</h2>
+          <div class="grid">
+            <button data-k="sin">sin</button>
+            <button data-k="cos">cos</button>
+            <button data-k="tan">tan</button>
+            <button data-k="hyp" class="toggle">hyp</button>
+            <button data-k="asin">sin⁻¹</button>
+            <button data-k="acos">cos⁻¹</button>
+            <button data-k="atan">tan⁻¹</button>
+            <button data-k="dms" title="Enter degrees/minutes/seconds, or show the result in that format">° ′ ″</button>
+          </div>
+        </section>
+
+        <section class="group">
+          <h2>Powers &amp; logarithms</h2>
+          <div class="grid">
+            <button data-k="sq">x²</button>
+            <button data-k="cube">x³</button>
+            <button data-k="pow">xʸ</button>
+            <button data-k="inv">x⁻¹</button>
+            <button data-k="sqrt">√x</button>
+            <button data-k="cbrt">∛x</button>
+            <button data-k="root">ʸ√x</button>
+            <button data-k="tenx">10ˣ</button>
+            <button data-k="log">log</button>
+            <button data-k="ln">ln</button>
+            <button data-k="ex">eˣ</button>
+            <button data-k="logab" title="Logarithm with base: logₐ(base, x)">logₐx</button>
+          </div>
+        </section>
+
+        <section class="group">
+          <h2>More</h2>
+          <div class="grid">
+            <button data-k="pi">π</button>
+            <button data-k="e">e</button>
+            <button data-k="fact">n!</button>
+            <button data-k="pct">%</button>
+            <button data-k="npr">nPr</button>
+            <button data-k="ncr">nCr</button>
+            <button data-k="abs">|x|</button>
+            <button data-k="comma">,</button>
+            <button data-k="frac" title="Fraction: a⌟b">a⌟b</button>
+            <button data-k="sd" title="Toggle fraction / decimal result">S⇔D</button>
+            <button data-k="eng" title="Engineering notation (press again to shift)">ENG</button>
+            <button data-k="ran" title="Random number 0–1">Rand</button>
+          </div>
+        </section>
+
+        <section class="group">
+          <h2>Memory</h2>
+          <div class="grid">
+            <button data-k="mplus" title="Add result to memory">M+</button>
+            <button data-k="mminus" title="Subtract result from memory">M−</button>
+            <button data-k="mr" title="Insert memory value">MR</button>
+            <button data-k="mc" title="Clear memory">MC</button>
+          </div>
+        </section>
+      </div>
+
+      <section class="pad" aria-label="Number pad">
+        <button data-k="ac" class="danger">AC</button>
+        <button data-k="del" class="soft">DEL</button>
+        <button data-k="lp" class="soft">(</button>
+        <button data-k="rp" class="soft">)</button>
+
+        <button data-k="d7" class="num">7</button>
+        <button data-k="d8" class="num">8</button>
+        <button data-k="d9" class="num">9</button>
+        <button data-k="div" class="op">÷</button>
+
+        <button data-k="d4" class="num">4</button>
+        <button data-k="d5" class="num">5</button>
+        <button data-k="d6" class="num">6</button>
+        <button data-k="mul" class="op">×</button>
+
+        <button data-k="d1" class="num">1</button>
+        <button data-k="d2" class="num">2</button>
+        <button data-k="d3" class="num">3</button>
+        <button data-k="sub" class="op">−</button>
+
+        <button data-k="d0" class="num">0</button>
+        <button data-k="dot" class="num">.</button>
+        <button data-k="exp" class="soft" title="×10 to the power">×10ˣ</button>
+        <button data-k="add" class="op">+</button>
+
+        <button data-k="neg" class="soft" title="Negative sign">(−)</button>
+        <button data-k="ans" class="soft">Ans</button>
+        <button data-k="eq" class="eq">=</button>
+      </section>
+    </div>
+
+    <p class="help">
+      Keyboard: digits, <kbd>+</kbd> <kbd>-</kbd> <kbd>*</kbd> <kbd>/</kbd> <kbd>^</kbd> <kbd>(</kbd> <kbd>)</kbd>,
+      <kbd>Enter</kbd> equals, <kbd>Backspace</kbd> delete, <kbd>Esc</kbd> clear,
+      <kbd>s</kbd> <kbd>c</kbd> <kbd>t</kbd> trig, <kbd>l</kbd> ln, <kbd>g</kbd> log, <kbd>r</kbd> √, <kbd>p</kbd> π,
+      <kbd>m</kbd> angle unit, <kbd>←</kbd> <kbd>→</kbd> cursor, <kbd>↑</kbd> <kbd>↓</kbd> history
+    </p>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
