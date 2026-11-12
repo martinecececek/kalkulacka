@@ -13,12 +13,21 @@
 </head>
 <body>
   <main class="app">
-    <h1>Scientific Calculator</h1>
+    <header class="page-head">
+      <h1>Scientific Calculator</h1>
+      <nav class="tabs">
+        <a href="index.html" aria-current="page">Calculator</a>
+        <a href="coords.html">Coordinates</a>
+        <a href="stars.html">Star map</a>
+        <a href="sun.html">Sun</a>
+      </nav>
+    </header>
 
     <section class="display" aria-live="polite">
       <div class="status">
         <span id="i-hyp" class="badge">HYP</span>
         <span id="i-m" class="badge">M</span>
+        <span id="i-sto" class="badge">STO</span>
       </div>
       <div class="expr" id="expr"></div>
       <div class="result" id="result">0</div>
@@ -90,14 +99,25 @@
           </div>
         </section>
 
-        <section class="group">
+        <section class="group memory" id="memory">
           <h2>Memory</h2>
           <div class="grid">
-            <button data-k="mplus" title="Add result to memory">M+</button>
-            <button data-k="mminus" title="Subtract result from memory">M−</button>
-            <button data-k="mr" title="Insert memory value">MR</button>
-            <button data-k="mc" title="Clear memory">MC</button>
+            <button data-k="sto" class="toggle" title="Store the result: press STO, then a variable">STO</button>
+            <button data-k="mplus" title="Add the result to M">M+</button>
+            <button data-k="mminus" title="Subtract the result from M">M−</button>
+            <button data-k="mclear" title="Reset all variables to 0" data-i18n-html="mem-clear">Clear</button>
           </div>
+          <div class="grid vars">
+            <button class="var" data-k="vA"><span class="var-name">A</span><span class="var-val">0</span></button>
+            <button class="var" data-k="vB"><span class="var-name">B</span><span class="var-val">0</span></button>
+            <button class="var" data-k="vC"><span class="var-name">C</span><span class="var-val">0</span></button>
+            <button class="var" data-k="vD"><span class="var-name">D</span><span class="var-val">0</span></button>
+            <button class="var" data-k="vX"><span class="var-name">X</span><span class="var-val">0</span></button>
+            <button class="var" data-k="vY"><span class="var-name">Y</span><span class="var-val">0</span></button>
+            <button class="var" data-k="vM"><span class="var-name">M</span><span class="var-val">0</span></button>
+            <button class="var ans-card" data-k="ansv" title="Last result"><span class="var-name">Ans</span><span class="var-val" id="ans-val">0</span></button>
+          </div>
+          <p class="group-hint" id="mem-hint">Tap a variable to use it in a calculation. To save a result, press STO and then a variable.</p>
         </section>
       </div>
 
@@ -133,7 +153,7 @@
       </section>
     </div>
 
-    <p class="help">
+    <p class="help" data-i18n-html="help-keys">
       Keyboard: digits, <kbd>+</kbd> <kbd>-</kbd> <kbd>*</kbd> <kbd>/</kbd> <kbd>^</kbd> <kbd>(</kbd> <kbd>)</kbd>,
       <kbd>Enter</kbd> equals, <kbd>Backspace</kbd> delete, <kbd>Esc</kbd> clear,
       <kbd>s</kbd> <kbd>c</kbd> <kbd>t</kbd> trig, <kbd>l</kbd> ln, <kbd>g</kbd> log, <kbd>r</kbd> √, <kbd>p</kbd> π,
@@ -141,6 +161,7 @@
     </p>
   </main>
 
+  <script src="i18n.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

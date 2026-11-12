@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GPS Coordinates</title>
+  <meta name="description" content="Great-circle distance, bearing and polygon area from GPS coordinates, shown on an interactive globe.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%234f6bed'/><ellipse cx='16' cy='16' rx='6' ry='14' fill='none' stroke='white' stroke-width='2'/><path d='M2 16h28' stroke='white' stroke-width='2'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="coords.css">
+</head>
+<body>
+  <main class="app wide">
+    <header class="page-head">
+      <h1>GPS Coordinates</h1>
+      <nav class="tabs">
+        <a href="index.html">Calculator</a>
+        <a href="coords.html" aria-current="page">Coordinates</a>
+        <a href="stars.html">Star map</a>
+        <a href="sun.html">Sun</a>
+      </nav>
+    </header>
+
+    <div class="workspace">
+      <!-- Globe -->
+      <section class="globe-card">
+        <div class="globe-wrap" id="wrap">
+          <canvas id="globe" aria-label="Globe with the points, the great-circle path and the triangle with the North Pole"></canvas>
+
+          <div class="globe-bar overlay">
+            <div class="glass group">
+              <button type="button" id="fit">Fit points</button>
+              <button type="button" id="world">Whole Earth</button>
+            </div>
+            <span class="spacer"></span>
+            <div class="glass group">
+              <label class="chk"><input type="checkbox" id="angles" checked> Angles</label>
+              <button type="button" id="add-mode" aria-pressed="false" title="Click the globe to add a point">＋ Click to add</button>
+            </div>
+          </div>
+
+          <div class="zoom-ctl glass overlay">
+            <button type="button" id="zoom-in" aria-label="Zoom in">+</button>
+            <button type="button" id="zoom-out" aria-label="Zoom out">−</button>
+          </div>
+
+          <div class="legend glass overlay" id="legend">
+            <span><i class="sw line" style="--c: var(--arc)"></i>Great circle g, sides 90° − lat</span>
+            <span><i class="sw line" style="--c: var(--equator)"></i>Equator</span>
+            <span><i class="sw line" style="--c: var(--meridian)"></i>Greenwich</span>
+            <span class="leg-angles"><i class="sw fill" style="--c: var(--wedge-lat)"></i>lat <i class="sw fill" style="--c: var(--wedge-lon)"></i>lon <i class="sw fill" style="--c: var(--arc)"></i>g</span>
+          </div>
+
+          <div class="readout glass overlay" id="readout">Drag to turn · scroll or pinch to zoom</div>
+        </div>
+      </section>
+
+      <!-- Side panel -->
+      <aside class="side">
+        <section class="card">
+          <div class="card-head">
+            <h2>Points</h2>
+            <div class="card-actions">
+              <select id="example" aria-label="Load an example">
+                <option value="">Example…</option>
+                <option value="cities">World cities</option>
+                <option value="prague">Prague landmarks</option>
+              </select>
+              <button type="button" class="small" id="clear">Clear</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="points">
+              <thead>
+                <tr>
+                  <th class="col-n">#</th>
+                  <th>Name</th>
+                  <th>Latitude</th>
+                  <th>Longitude</th>
+                  <th class="col-del"><span class="sr">Remove</span></th>
+                </tr>
+              </thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+          <button type="button" class="add" id="add">+ Add point</button>
+
+          <details class="paste">
+            <summary>Paste a list of points</summary>
+            <p class="muted" data-i18n-html="paste-help">One point per line, e.g. <code>50.4743964N, 14.3278153E</code>, <code>50.4743964, 14.3278153</code> or <code>Home 50°28′27.8″N 14°19′40.1″E</code>. You can also paste a pair straight into a table cell.</p>
+            <textarea id="paste" rows="4" spellcheck="false" placeholder="Praha 50.0755N, 14.4378E&#10;New York 40.7128N, 74.0060W"></textarea>
+            <div class="paste-actions">
+              <button type="button" class="small" id="paste-replace">Replace points</button>
+              <button type="button" class="small" id="paste-append">Add to list</button>
+            </div>
+          </details>
+        </section>
+
+        <section class="card">
+          <h2>Distance</h2>
+          <div class="pair">
+            <label><span><b class="tag">P₁</b> from</span> <select id="from"></select></label>
+            <button type="button" class="icon-btn" id="swap" title="Swap" aria-label="Swap points">⇄</button>
+            <label><span><b class="tag">P₂</b> to</span> <select id="to"></select></label>
+          </div>
+          <dl class="stats" id="pair"></dl>
+        </section>
+
+        <section class="card">
+          <h2>Area</h2>
+          <dl class="stats" id="poly"></dl>
+          <p class="warn" id="poly-warn" hidden></p>
+          <p class="muted small-text foot">All points, joined in list order along great circles.</p>
+        </section>
+
+        <details class="card conv-card">
+          <summary><h2>Decimal ⇄ DMS converter</h2></summary>
+          <div class="conv">
+            <label>Decimal degrees <input id="g-dec" inputmode="decimal" autocomplete="off" placeholder="50.0875"></label>
+            <label>Degrees, minutes, seconds <input id="g-dms" autocomplete="off" placeholder="50°5′15″ N"></label>
+          </div>
+          <p class="muted small-text foot">A negative value or S / W means south or west.</p>
+        </details>
+      </aside>
+    </div>
+
+    <section class="card steps-card">
+      <div class="card-head">
+        <h2>How the distance is calculated</h2>
+        <span class="muted small-text" id="steps-pair"></span>
+      </div>
+      <ol class="steps" id="steps"></ol>
+    </section>
+
+    <p class="credit muted small-text">Land and borders: <a href="https://www.naturalearthdata.com/">Natural Earth</a> (public domain).</p>
+  </main>
+
+  <script src="i18n.js"></script>
+  <script src="earth-data.js"></script>
+  <script src="coords.js"></script>
+</body>
+</html>

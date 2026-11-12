@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sun Declination</title>
+  <meta name="description" content="Table of the Sun's declination for every day of the year, with noon Sun height and day length.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23f0a92a'/><circle cx='16' cy='16' r='6' fill='white'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="sun.css">
+</head>
+<body>
+  <main class="app wide">
+    <header class="page-head">
+      <h1>Sun Declination</h1>
+      <nav class="tabs">
+        <a href="index.html">Calculator</a>
+        <a href="coords.html">Coordinates</a>
+        <a href="stars.html">Star map</a>
+        <a href="sun.html" aria-current="page">Sun</a>
+      </nav>
+    </header>
+
+    <div class="sun-top">
+      <section class="card lookup">
+        <h2>Look up a date</h2>
+        <div class="row2">
+          <label>Date <input type="date" id="date"></label>
+          <label>Latitude <input id="lat" inputmode="decimal" autocomplete="off" value="50.08"></label>
+        </div>
+        <div class="big-value">
+          <span class="big" id="decl">—</span>
+          <span class="muted" id="decl-note"></span>
+        </div>
+        <dl class="facts" id="facts"></dl>
+        <button type="button" class="small" id="today">Today</button>
+      </section>
+
+      <section class="card about">
+        <h2>Tabulka deklinací Slunce</h2>
+        <p>The declination is the Sun's angle north or south of the celestial equator.</p>
+        <p data-i18n-html="sun-signs"><b class="pos">+</b> the Sun is above (north of) the celestial equator · <b class="neg">−</b> below (south of) it.</p>
+        <p class="muted small-text">Values change by a few arcminutes from year to year. Click any cell to look up that day. The noon height and day length are calculated from the table value and your latitude (day length ignores refraction, so real days are a few minutes longer).</p>
+      </section>
+    </div>
+
+    <section class="card chart-card">
+      <div class="chart-head">
+        <div>
+          <h2 id="chart-title">Declination through the year</h2>
+          <p class="muted small-text" id="chart-sub">Above zero the Sun is north of the celestial equator, below zero south of it.</p>
+        </div>
+        <div class="segmented" role="group" aria-label="What to show">
+          <button type="button" data-view="decl" class="active">Declination</button>
+          <button type="button" data-view="noon">Noon height</button>
+          <button type="button" data-view="day">Day length</button>
+        </div>
+      </div>
+      <div class="chart-wrap" id="chart-wrap">
+        <svg id="chart" role="img" aria-label="Line chart of the Sun's declination for every day of the year"></svg>
+        <div class="chart-tip" id="chart-tip" hidden></div>
+      </div>
+      <p class="muted small-text chart-foot">Hover to read a day, click to look it up. The table below has every value.</p>
+    </section>
+
+    <section class="card table-card">
+      <div class="table-scroll">
+        <table class="decl" id="table">
+          <thead><tr id="head"></tr></thead>
+          <tbody id="body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="i18n.js"></script>
+  <script src="sun-data.js"></script>
+  <script src="sun.js"></script>
+</body>
+</html>

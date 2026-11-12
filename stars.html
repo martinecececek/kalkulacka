@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rotating Star Map</title>
+  <meta name="description" content="An interactive planisphere: turn the star disc to see the night sky for any date, time and place.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='15' fill='%23163a73'/><path d='M16 7l2.2 6.3H25l-5.4 4 2 6.4L16 19.8l-5.6 3.9 2-6.4-5.4-4h6.8z' fill='%23f5d76e'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="stars.css">
+</head>
+<body>
+  <main class="app wide">
+    <header class="page-head">
+      <h1>Rotating Star Map</h1>
+      <nav class="tabs">
+        <a href="index.html">Calculator</a>
+        <a href="coords.html">Coordinates</a>
+        <a href="stars.html" aria-current="page">Star map</a>
+        <a href="sun.html">Sun</a>
+      </nav>
+    </header>
+
+    <div class="sky-layout">
+      <section class="sky-stage">
+        <div class="map-tools">
+          <button type="button" id="view-toggle" class="tool-wide">Sky window</button>
+          <button type="button" id="zoom-out" aria-label="Zoom out">−</button>
+          <button type="button" id="zoom-in" aria-label="Zoom in">+</button>
+        </div>
+        <div class="canvas-wrap" id="wrap">
+          <canvas id="sky" aria-label="Rotating star map. Drag to turn the star disc."></canvas>
+          <div class="tooltip" id="tip" hidden></div>
+        </div>
+        <p class="hint">
+          <span class="hint-mouse">Drag to turn the star disc · scroll or double-click to zoom · Shift + drag to move the view · hover a star for details.</span>
+          <span class="hint-touch">Drag with one finger to turn the disc · pinch to zoom and move · tap a star for details.</span>
+          Hold the map above your head with the direction you are facing at the bottom.
+        </p>
+      </section>
+
+      <aside class="sky-panel">
+        <section class="card">
+          <h2>Date &amp; time</h2>
+          <div class="row2">
+            <label>Date <input type="date" id="date"></label>
+            <label>Time <input type="time" id="time" step="60"></label>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="small" id="minus-h">−1 h</button>
+            <button type="button" class="small" id="now">Now</button>
+            <button type="button" class="small" id="plus-h">+1 h</button>
+            <button type="button" class="small" id="play" aria-pressed="false">▶ Play</button>
+          </div>
+          <dl class="facts" id="facts"></dl>
+        </section>
+
+        <section class="card">
+          <h2>Location</h2>
+          <label class="full">Place
+            <select id="place">
+              <option value="">Custom</option>
+              <option value="50.0755,14.4378">Praha</option>
+              <option value="49.1951,16.6068">Brno</option>
+              <option value="49.8209,18.2625">Ostrava</option>
+              <option value="49.7384,13.3736">Plzeň</option>
+              <option value="48.1486,17.1077">Bratislava</option>
+              <option value="48.2082,16.3738">Vienna</option>
+              <option value="52.5200,13.4050">Berlin</option>
+              <option value="51.5074,-0.1278">London</option>
+              <option value="40.7128,-74.0060">New York</option>
+              <option value="-33.8688,151.2093">Sydney</option>
+            </select>
+          </label>
+          <div class="row2">
+            <label>Latitude <input id="lat" inputmode="decimal" autocomplete="off"></label>
+            <label>Longitude <input id="lon" inputmode="decimal" autocomplete="off"></label>
+          </div>
+          <button type="button" class="small wide-btn" id="locate">Use my location</button>
+          <p class="note" id="loc-note" hidden></p>
+        </section>
+
+        <section class="card">
+          <h2>Show</h2>
+          <div class="checks">
+            <label><input type="checkbox" id="o-lines" checked> Constellation lines</label>
+            <label><input type="checkbox" id="o-cnames" checked> Constellation names</label>
+            <label><input type="checkbox" id="o-snames" checked> Star names</label>
+            <label><input type="checkbox" id="o-mw" checked> Milky Way</label>
+            <label><input type="checkbox" id="o-messier"> Messier objects</label>
+            <label><input type="checkbox" id="o-grid" checked> Grid &amp; ecliptic</label>
+            <label><input type="checkbox" id="o-sun" checked> Sun</label>
+            <label><input type="checkbox" id="o-clear"> See-through cover</label>
+          </div>
+          <label class="full">Faintest stars: <span id="mag-val"></span>
+            <input type="range" id="mag" min="2" max="6" step="0.5" value="5">
+          </label>
+          <label class="full">Sky labels
+            <select id="lang">
+              <option value="en">English</option>
+              <option value="cz">Čeština</option>
+              <option value="la">Latin</option>
+            </select>
+          </label>
+        </section>
+      </aside>
+    </div>
+
+    <p class="credit">Star data: Hipparcos catalogue via <a href="https://github.com/ofrohn/d3-celestial">d3-celestial</a> by Olaf Frohn (BSD-3-Clause).</p>
+  </main>
+
+  <script src="i18n.js"></script>
+  <script src="stars-data.js"></script>
+  <script src="stars.js"></script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 
 const SYNTAX = 'Syntax ERROR';
 const MATH = 'Math ERROR';
-const VARS = ['M'];
+const VARS = ['A', 'B', 'C', 'D', 'X', 'Y', 'M'];
 const STORE_KEY = 'kalk-state-v2';
 
 const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
@@ -13,6 +13,8 @@ const state = {
   cursor: 0,
   mode: 'edit', // edit | result | error
   hyp: false,
+  storing: false,
+  justStored: null,
   angle: 'DEG',
   ans: 0,
   value: 0,
@@ -420,7 +422,33 @@ function trigKey(name, inverse) {
 function memAdd(sign) {
   if (!ensureResult()) return;
   state.vars.M += sign * state.value;
+  state.justStored = 'M';
   save();
+}
+
+function store(v) {
+  if (state.mode === 'error') return;
+  if (state.mode === 'edit' && state.tokens.length) {
+    const arrow = state.tokens.indexOf('→');
+    if (arrow >= 0) state.tokens = state.tokens.slice(0, arrow);
+  } else {
+    // A result browsed from history may differ from Ans; store what is shown.
+    if (state.mode === 'result') state.ans = state.value;
+    state.tokens = ['Ans'];
+  }
+  state.tokens.push('→', v);
+  state.mode = 'edit';
+  equals();
+  if (state.mode === 'result') state.justStored = v;
+}
+
+function clearVars() {
+  for (const v of VARS) state.vars[v] = 0;
+  save();
+}
+
+function varKey(v) {
+  return () => state.storing ? store(v) : insert(v);
 }
 
 function eng(dir) {
@@ -471,10 +499,12 @@ const KEYS = {
   npr: 'nPr', ncr: 'nCr', abs: 'Abs(', comma: ',',
   frac: '⌟', sd: toggleSD, eng: () => eng(-1), ran: 'Ran#',
 
+  sto: () => { state.storing = !state.storing; },
   mplus: () => memAdd(1),
   mminus: () => memAdd(-1),
-  mr: 'M',
-  mc: () => { state.vars.M = 0; save(); },
+  mclear: clearVars,
+  ansv: 'Ans',
+  ...Object.fromEntries(VARS.map(v => ['v' + v, varKey(v)])),
 
   ac, del, eq: equals,
   lp: '(', rp: ')',
@@ -491,6 +521,7 @@ function press(name) {
   if (typeof action === 'string') insert(action);
   else action();
   if (!KEEPS_HYP.has(name)) state.hyp = false;
+  if (name !== 'sto') state.storing = false;
   render();
 }
 
@@ -504,7 +535,9 @@ const TRIG_KEYS = ['sin', 'cos', 'tan', 'asin', 'acos', 'atan'];
 function render() {
   $('i-hyp').classList.toggle('on', state.hyp);
   $('i-m').classList.toggle('on', state.vars.M !== 0);
+  $('i-sto').classList.toggle('on', state.storing);
   document.querySelector('[data-k="hyp"]').classList.toggle('active', state.hyp);
+  renderMemory();
   for (const a of ['deg', 'rad', 'gra']) {
     document.querySelector(`[data-k="${a}"]`).classList.toggle('active', state.angle === a.toUpperCase());
   }
@@ -547,6 +580,29 @@ function render() {
     resultEl.textContent = fmtResult();
     resultEl.scrollLeft = resultEl.scrollWidth;
   }
+}
+
+function renderMemory() {
+  $('memory').classList.toggle('storing', state.storing);
+  document.querySelector('[data-k="sto"]').classList.toggle('active', state.storing);
+  $('mem-hint').textContent = state.storing
+    ? 'Choose a variable to store the result in.'
+    : 'Tap a variable to use it in a calculation. To save a result, press STO and then a variable.';
+
+  for (const v of VARS) {
+    const btn = document.querySelector(`[data-k="v${v}"]`);
+    const text = fmtNum(state.vars[v]);
+    btn.querySelector('.var-val').textContent = text;
+    btn.title = `${v} = ${text}`;
+    btn.classList.toggle('empty', state.vars[v] === 0);
+    if (state.justStored === v) {
+      btn.classList.remove('stored');
+      void btn.offsetWidth; // restart the animation
+      btn.classList.add('stored');
+    }
+  }
+  state.justStored = null;
+  $('ans-val').textContent = fmtNum(state.ans);
 }
 
 /* ---------------- Persistence ---------------- */
